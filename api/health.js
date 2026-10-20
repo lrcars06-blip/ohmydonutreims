@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   return json(res, 200, {
     ok: true,
     stripe: !!env.stripeKey,
-    stripeMode: env.stripeKey.startsWith('sk_live_') ? 'live' : env.stripeKey ? 'test' : null,
+    stripeMode: /^(sk|rk)_live_/.test(env.stripeKey) ? 'live' : env.stripeKey ? 'test' : null,
     stripeWebhook: !!env.stripeWebhookSecret,
     email: !!env.resendKey,
     emailFrom: env.mailFrom.replace(/.*<|>.*/g, ''),
