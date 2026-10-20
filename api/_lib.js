@@ -25,8 +25,11 @@ export const env = {
   shopEmail: process.env.SHOP_EMAIL || 'ohmydonut51@gmail.com',
   callmebotKey: process.env.CALLMEBOT_KEY || '',
   callmebotPhone: process.env.CALLMEBOT_PHONE || '33647698209',
+  brevoKey: process.env.BREVO_API_KEY || '',
+  smsTo: (process.env.SMS_TO || '33647698209').replace(/[^\d]/g, ''),
+  smsSender: (process.env.SMS_SENDER || 'OhMyDonut').replace(/[^A-Za-z0-9]/g, '').slice(0, 11),
   siteUrl: (process.env.SITE_URL || '').replace(/\/$/, ''),
-  assetUrl: (process.env.SITE_URL || 'https://ohmydonut51.vercel.app').replace(/\/$/, '')
+  assetUrl: (process.env.SITE_URL || 'https://ohmydonutreims.com').replace(/\/$/, '')
 };
 
 export function siteUrl(req) {
@@ -255,6 +258,30 @@ export async function sendMail({ to, subject, html, replyTo, idempotencyKey }) {
   return { ok: r.ok, status: r.status };
 }
 
+// SMS à la boutique via Brevo (https://developers.brevo.com/docs/transactional-sms-endpoints)
+export async function sendSms(text) {
+  if (!env.brevoKey) return { ok: false, skipped: true };
+  try {
+    const r = await fetch('https://api.brevo.com/v3/transactionalSMS/send', {
+      method: 'POST',
+      headers: { 'api-key': env.brevoKey, 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ sender: env.smsSender, recipient: env.smsTo, content: text, type: 'transactional', tag: 'commande' })
+    });
+    return { ok: r.ok, status: r.status };
+  } catch { return { ok: false }; }
+}
+// Texte court, sans accents ni emoji (1 SMS = 160 caractères), 2 SMS maximum
+export function smsText(o) {
+  const plain = v => String(v ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\x20-\x7E]/g, '');
+  const d = o.date ? `${o.date.slice(8, 10)}/${o.date.slice(5, 7)}` : '';
+  const head = `${o.mode === 'event' ? 'RESA' : 'Commande'} ${o.code} payee ${euro(o.paid ?? o.total).replace(' €', 'E')}. Retrait ${d} ${o.time}. ${o.name} ${o.phone}.`;
+  const items = o.lines.map(l => `${l.qty}x ${l.name.replace(/^Box de (\d+) donuts$/, 'Box $1')}${l.opts ? ` (${l.opts})` : ''}`).join(', ');
+  const note = o.note ? ` NOTE: ${o.note}` : '';
+  let t = plain(`${head} ${items}.${note}`);
+  if (t.length > 306) t = t.slice(0, 290) + '... (voir mail)';
+  return t;
+}
+
 export async function sendWhatsApp(text) {
   if (!env.callmebotKey) return { ok: false, skipped: true };
   try {
@@ -370,9 +397,10 @@ ${o.note ? `<p style="font-size:13px;color:${C_.chocoSoft};margin:12px 0 0"><b>T
 export async function notifyAll(o, headline, idemBase) {
   const jobs = [
     sendMail({ to: env.shopEmail, subject: `${headline} ${o.code} · ${o.pickup}`, html: shopEmail(o, headline), replyTo: o.email || undefined, idempotencyKey: idemBase && `${idemBase}-shop` }),
-    sendWhatsApp(orderText(o, headline))
+    sendWhatsApp(orderText(o, headline)),
+    sendSms(smsText(o))
   ];
   if (o.email) jobs.push(sendMail({ to: o.email, subject: `🍩 Oh My Donut : ${o.mode === 'event' ? 'réservation' : 'commande'} ${o.code} confirmée (retrait ${o.pickup})`, html: customerEmail(o), replyTo: env.shopEmail, idempotencyKey: idemBase && `${idemBase}-client` }));
-  const [shop, wa, client] = await Promise.all(jobs.map(p => p.catch(() => ({ ok: false }))));
-  return { shop: !!shop?.ok, whatsapp: !!wa?.ok, client: client ? !!client.ok : null };
+  const [shop, wa, sms, client] = await Promise.all(jobs.map(p => p.catch(() => ({ ok: false }))));
+  return { shop: !!shop?.ok, whatsapp: !!wa?.ok, sms: !!sms?.ok, client: client ? !!client.ok : null };
 }
