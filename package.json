@@ -1,0 +1,6 @@
+{
+  "name": "ohmydonut-reims",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=18" }
+}

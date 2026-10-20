@@ -1,0 +1,44 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/catalog.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "api/*.js": {
+      "includeFiles": "catalog.js",
+      "maxDuration": 15
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(cut-[a-z0-9-]+\\.webp)",
+      "destination": "/api/asset?f=$1"
+    },
+    {
+      "source": "/(mail-[a-z0-9-]+\\.jpg)",
+      "destination": "/api/asset?f=$1"
+    }
+  ]
+}
