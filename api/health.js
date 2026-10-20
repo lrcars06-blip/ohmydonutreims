@@ -11,6 +11,7 @@ export default async function handler(req, res) {
     email: !!env.resendKey,
     emailFrom: env.mailFrom.replace(/.*<|>.*/g, ''),
     whatsapp: !!env.callmebotKey,
+    sms: !!env.brevoKey,
     products
   });
 }
