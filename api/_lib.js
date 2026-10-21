@@ -26,6 +26,8 @@ export const env = {
   callmebotKey: process.env.CALLMEBOT_KEY || '',
   callmebotPhone: process.env.CALLMEBOT_PHONE || '33647698209',
   brevoKey: process.env.BREVO_API_KEY || '',
+  telegramToken: process.env.TELEGRAM_BOT_TOKEN || '',
+  telegramChat: process.env.TELEGRAM_CHAT_ID || '',
   smsTo: (process.env.SMS_TO || '33647698209').replace(/[^\d]/g, ''),
   smsSender: (process.env.SMS_SENDER || 'OhMyDonut').replace(/[^A-Za-z0-9]/g, '').slice(0, 11),
   siteUrl: (process.env.SITE_URL || '').replace(/\/$/, ''),
@@ -282,6 +284,19 @@ export function smsText(o) {
   return t;
 }
 
+// Message Telegram à la boutique (bot créé avec @BotFather)
+export async function sendTelegram(text) {
+  if (!env.telegramToken || !env.telegramChat) return { ok: false, skipped: true };
+  try {
+    const ids = env.telegramChat.split(',').map(x => x.trim()).filter(Boolean);
+    const rs = await Promise.all(ids.map(id => fetch(`https://api.telegram.org/bot${env.telegramToken}/sendMessage`, {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ chat_id: id, text, disable_web_page_preview: true })
+    })));
+    return { ok: rs.every(r => r.ok) };
+  } catch { return { ok: false }; }
+}
+
 export async function sendWhatsApp(text) {
   if (!env.callmebotKey) return { ok: false, skipped: true };
   try {
@@ -398,9 +413,10 @@ export async function notifyAll(o, headline, idemBase) {
   const jobs = [
     sendMail({ to: env.shopEmail, subject: `${headline} ${o.code} · ${o.pickup}`, html: shopEmail(o, headline), replyTo: o.email || undefined, idempotencyKey: idemBase && `${idemBase}-shop` }),
     sendWhatsApp(orderText(o, headline)),
-    sendSms(smsText(o))
+    sendSms(smsText(o)),
+    sendTelegram(orderText(o, headline))
   ];
   if (o.email) jobs.push(sendMail({ to: o.email, subject: `🍩 Oh My Donut : ${o.mode === 'event' ? 'réservation' : 'commande'} ${o.code} confirmée (retrait ${o.pickup})`, html: customerEmail(o), replyTo: env.shopEmail, idempotencyKey: idemBase && `${idemBase}-client` }));
-  const [shop, wa, sms, client] = await Promise.all(jobs.map(p => p.catch(() => ({ ok: false }))));
-  return { shop: !!shop?.ok, whatsapp: !!wa?.ok, sms: !!sms?.ok, client: client ? !!client.ok : null };
+  const [shop, wa, sms, tg, client] = await Promise.all(jobs.map(p => p.catch(() => ({ ok: false }))));
+  return { shop: !!shop?.ok, whatsapp: !!wa?.ok, sms: !!sms?.ok, telegram: !!tg?.ok, client: client ? !!client.ok : null };
 }
