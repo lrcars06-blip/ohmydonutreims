@@ -12,6 +12,7 @@ export default async function handler(req, res) {
     emailFrom: env.mailFrom.replace(/.*<|>.*/g, ''),
     whatsapp: !!env.callmebotKey,
     sms: !!env.brevoKey,
+    telegram: !!(env.telegramToken && env.telegramChat),
     products
   });
 }
