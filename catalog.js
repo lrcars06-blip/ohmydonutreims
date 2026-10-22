@@ -8,24 +8,29 @@ window.CATALOG = /*JSON*/{
  "version": 1,
  "currency": "eur",
  "softs": [
-  "Coca Zéro",
-  "Fanta Orange",
-  "Fanta Fraise Kiwi",
-  "Mirinda Orange",
-  "7 Up",
-  "Pepsi Mangue",
-  "Fuze Tea",
-  "Dada Cherry",
-  "Dada Lychee",
-  "Dada Melon",
-  "Dada Citron vert menthe",
+  "Coca-Cola",
+  "Coca-Cola Zéro",
+  "Pepsi",
   "Dada Cola",
-  "Dada Pêche",
-  "Dada Mangue",
-  "Dada Fraise",
   "Dr Pepper Cherry",
-  "Kinza Cola",
-  "Kinza Lemon"
+  "Fanta Orange",
+  "Fanta Fraise",
+  "Fanta Fruits des bois",
+  "Fanta Exotique",
+  "Mirinda Orange",
+  "Oasis Mangue Passion",
+  "Oasis Tropical",
+  "Lipton Ice Tea Pêche",
+  "Kinza Lemon",
+  "Hawaï Tropical",
+  "Brio",
+  "Minute Maid Multifruit",
+  "Dada Mangue",
+  "Dada Melon",
+  "Dada Pêche",
+  "Dada Litchi",
+  "Dada Cerise",
+  "Dada Mojito"
  ],
  "boxSizes": [
   {
@@ -401,27 +406,47 @@ window.CATALOG = /*JSON*/{
    "id": "b-bubble",
    "cat": "boissons",
    "name": "Bubble tea",
-   "desc": "Thé glacé et perles, parfum au choix.",
+   "desc": "Thé parfumé au sirop et billes qui éclatent en bouche, saveurs au choix.",
    "price": 5.5,
    "img": "drink-bubble-tea.webp",
    "noCut": true,
    "options": [
     {
-     "label": "Parfum",
+     "label": "Saveur du sirop",
      "choices": [
-      "Lait classique",
-      "Taro",
-      "Fraise",
-      "Mangue",
-      "Matcha"
+      "Pastèque",
+      "Melon",
+      "Ananas",
+      "Noix de coco",
+      "Grenadine",
+      "Citron",
+      "Mojito",
+      "Myrtille",
+      "Pomme",
+      "Fruit de la passion",
+      "Framboise",
+      "Pêche",
+      "Cerise",
+      "Violette"
      ]
     },
     {
-     "label": "Perles",
+     "label": "Saveur des billes",
      "choices": [
-      "Tapioca",
-      "Popping fraise",
-      "Popping mangue"
+      "Banane",
+      "Fruit du dragon",
+      "Pêche",
+      "Kiwi",
+      "Pastèque",
+      "Tropical",
+      "Cerise",
+      "Pomme",
+      "Citron",
+      "Litchi",
+      "Framboise",
+      "Fraise",
+      "Mangue",
+      "Passion"
      ]
     }
    ]
@@ -430,20 +455,29 @@ window.CATALOG = /*JSON*/{
    "id": "b-milkshake",
    "cat": "boissons",
    "name": "Milkshake",
-   "desc": "Milkshake à composer, avec chantilly.",
+   "desc": "Une glace au choix, mixée avec ta gourmandise préférée.",
    "price": 5,
    "img": "drink-milkshake.webp",
    "noCut": true,
    "options": [
     {
-     "label": "Parfum",
+     "label": "Glace",
      "choices": [
       "Vanille",
       "Fraise",
-      "Chocolat",
+      "Chocolat"
+     ]
+    },
+    {
+     "label": "Saveur",
+     "choices": [
+      "Oreo",
+      "Bueno",
+      "Cookie",
+      "M&M's",
       "Spéculos",
-      "Caramel beurre salé",
-      "Oreo"
+      "Caramel",
+      "Café"
      ]
     }
    ]
@@ -479,7 +513,7 @@ window.CATALOG = /*JSON*/{
    "id": "b-canette",
    "cat": "boissons",
    "name": "Canette fraîche",
-   "desc": "Coca Zéro, Fanta, 7 Up, Pepsi Mangue, Fuze Tea, Dada, Kinza…",
+   "desc": "Coca-Cola, Pepsi, Fanta, Oasis, Lipton, Kinza, Hawaï, Dada… bien fraîche.",
    "price": 2,
    "art": {
     "kind": "cup",
@@ -493,16 +527,53 @@ window.CATALOG = /*JSON*/{
    ]
   },
   {
+   "id": "b-energy",
+   "cat": "boissons",
+   "name": "Boisson énergisante",
+   "desc": "Red Bull ou Monster, bien frais.",
+   "price": 3.5,
+   "art": {
+    "kind": "cup",
+    "liquid": "#2B6CB0"
+   },
+   "options": [
+    {
+     "label": "Ta boisson",
+     "choices": [
+      "Red Bull",
+      "Monster Juiced Mango Loco",
+      "Monster Ultra (zéro sucre)"
+     ]
+    }
+   ]
+  },
+  {
    "id": "b-matcha",
    "cat": "boissons",
-   "name": "Matcha latte",
-   "desc": "Matcha et lait, chaud ou glacé.",
+   "name": "Matcha",
+   "desc": "Notre matcha glacé ou chaud, en latte, nature, fruité ou au café.",
    "price": 4.5,
    "art": {
     "kind": "cup",
     "liquid": "#9CC46A"
    },
    "options": [
+    {
+     "label": "Recette",
+     "choices": [
+      "Latte",
+      "Non latte",
+      "Fruité",
+      "Au café"
+     ]
+    },
+    {
+     "label": "Billes bubble tea",
+     "choices": [
+      "Sans billes",
+      "Avec billes"
+     ]
+    },
     {
      "label": "Service",
      "choices": [
